@@ -1,0 +1,112 @@
+{% extends 'home/base.html' %}
+{% load staticfiles %}
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/jquery.wysiwygEditor.css' %}">
+
+<script src="{% static 'js/jquery.wysiwygEditor.js' %}"></script>
+{#<script {% static 'js/less.js' %}></script>#}
+{#  <script src="https://code.jquery.com/jquery-2.1.4.js"></script>#}
+<style>
+    body {
+      font-family: 'Open Sans', sans-serif;
+      font-weight: 300;
+      line-height: 1.6em;
+    }
+    iframe {
+      border: none;
+      outline: none;
+      position: relative;
+      //width: 100%;
+      background: #fff;
+      //padding: 15px;
+    }
+  </style>
+<div style="max-width: 80%; margin: 0 auto; margin-top: 20px; height: 90%;">
+    {% csrf_token %}
+    <textarea style="min-width: auto;" id="inarea" class="wysiwyg-editor"></textarea><br><br>
+    <input type="button" class="btn btn-primary" id="subbut" value="submit" onclick="getdata();">
+    <input type="button" class="btn btn-secondary" id="dloadbut" value="Download CSV" style="display: none;" onclick="dload();">
+    <div id="temp" style="display: none; margin: auto;"></div>
+</div>
+<script type="text/javascript">
+    var scode = "";
+
+    $(document).ready(function() {
+        //alert("here");
+        $('textarea').wysiwygEditor();
+    });
+
+    function dload() {
+        var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
+        //alert(csrftoken);
+        $.ajax({
+            url: 'dload/',
+            type: 'POST',
+            data:{
+                'csrfmiddlewaretoken': csrftoken,
+                'scode': scode,
+            },
+            error: function(){
+                alert('error!!!');
+            },
+            success: function (response) {
+                alert(response);
+                //var win = window.open(response, '_blank');
+                window.location.href = response;
+            }
+
+        });
+    }
+
+    function getdata() {
+                    //e.preventDefault();
+
+        var data = $('textarea').val();
+        //alert(data);
+        $('#temp').append(data);
+        // alert($('#Table3').length);
+        var d = "";
+        var flag = 1;
+        var nodes = $('td[colspan]').filter(function() {
+          if ($(this).attr('colspan') == 16 && flag == 1){
+              scode = ($(this).text());
+              flag = 0;
+              //alert(scode);
+          }
+        });
+        $('#Table3').find('> tbody > tr.mark2').each(function () {
+
+            //console.log($(this).text());
+            d = d + $(this).text() + "-!-";
+
+        });
+        $('#Table3').find('> tbody > tr.mark').each(function () {
+
+            //console.log($(this).text());
+            d = d + $(this).text() + "-!-";
+
+        });
+        //alert(d);
+        var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
+        //alert(csrftoken);
+        $.ajax({
+            url: 'printw/',
+            type: 'POST',
+            data:{
+                'csrfmiddlewaretoken': csrftoken,
+                'd':d,
+                'scode':scode,
+            },
+            error: function(){
+                alert('error!!!');
+            },
+            success: function (response) {
+                //alert(response);
+                $('#subbut').css('display', 'none');
+                $('#dloadbut').css('display', 'block');
+            }
+
+        });
+    }
+</script>
+{% endblock content %}

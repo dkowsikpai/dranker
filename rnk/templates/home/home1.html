@@ -1,0 +1,59 @@
+{% extends 'home/base.html' %}
+{% load staticfiles %}
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/jquery.wysiwygEditor.css' %}">
+
+<script src="{% static 'js/jquery.wysiwygEditor.js' %}"></script>
+{#<script {% static 'js/less.js' %}></script>#}
+{#  <script src="https://code.jquery.com/jquery-2.1.4.js"></script>#}
+<style>
+    body {
+      font-family: 'Open Sans', sans-serif;
+      font-weight: 300;
+      line-height: 1.6em;
+    }
+    iframe {
+      border: none;
+      outline: none;
+      position: relative;
+      //width: 100%;
+      background: #fff;
+      //padding: 15px;
+    }
+  </style>
+<div style="max-width: 80%; margin: 0 auto; margin-top: 20px;">
+    {% csrf_token %}
+    <textarea style="min-width: auto;" class="wysiwyg-editor"></textarea>
+</div>
+    <input type="button" value="submit" onclick="getdata();">
+<script type="text/javascript">
+    $(document).ready(function() {
+        //alert("here");
+        $('textarea').wysiwygEditor();
+    });
+
+    function getdata() {
+                    //e.preventDefault();
+
+        var data = $('textarea').val();
+        alert(data);
+        var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
+        //alert(csrftoken);
+        $.ajax({
+            url: 'printw/',
+            type: 'POST',
+            data:{
+                'csrfmiddlewaretoken': csrftoken,
+                'd':data,
+            },
+            error: function(){
+                alert('error!!!');
+            },
+            success: function (response) {
+                alert(response);
+            }
+
+        });
+    }
+</script>
+{% endblock content %}
