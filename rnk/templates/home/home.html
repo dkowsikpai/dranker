@@ -23,11 +23,15 @@
   </style>
 <div style="max-width: 80%; margin: 0 auto; margin-top: 20px; height: 90%;">
     {% csrf_token %}
+    <div class="alert alert-info">Copy the whole data from DHSE portal(Ctrl + A, then Ctrl + C). Paste it in the field(Ctrl + V)</div><br>
     <textarea style="min-width: auto;" id="inarea" class="wysiwyg-editor"></textarea><br><br>
     <input type="button" class="btn btn-primary" id="subbut" value="submit" onclick="getdata();">
+    <div id="spinid" style="display:none;">Please wait while the server process the data...</div>
     <input type="button" class="btn btn-secondary" id="dloadbut" value="Download CSV" style="display: none;" onclick="dload();">
+    <input type="button" class="btn btn-secondary" id="plotbut" value="Download Plot" style="display: none;" onclick="plotdata();">
     <div id="temp" style="display: none; margin: auto;"></div>
 </div>
+<div style="text-align:center;"><small><i>Developed by KNDCSE, GEC - TCR Website: bit.ly/kndcse</i></small></div>
 <script type="text/javascript">
     var scode = "";
 
@@ -50,7 +54,30 @@
                 alert('error!!!');
             },
             success: function (response) {
-                alert(response);
+                //alert(response);
+                //var win = window.open(response, '_blank');
+                window.location.href = response;
+            }
+
+        });
+    }
+
+    function plotdata() {
+        var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
+        //alert(csrftoken);
+        //alert(scode);
+        $.ajax({
+            url: 'getplotdata/',
+            type: 'POST',
+            data:{
+                'csrfmiddlewaretoken': csrftoken,
+                'scode': scode,
+            },
+            error: function(){
+                alert('error!!!');
+            },
+            success: function (response) {
+                //alert(response);
                 //var win = window.open(response, '_blank');
                 window.location.href = response;
             }
@@ -89,6 +116,8 @@
         //alert(d);
         var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
         //alert(csrftoken);
+        // $('#spinid').css('display', 'block');
+        $('#subbut').css('display', 'none')
         $.ajax({
             url: 'printw/',
             type: 'POST',
@@ -102,8 +131,10 @@
             },
             success: function (response) {
                 //alert(response);
+                $('#spinid').css('display', 'none');
                 $('#subbut').css('display', 'none');
-                $('#dloadbut').css('display', 'block');
+                $('#dloadbut').css('display', 'inline');
+                $('#plotbut').css('display', 'inline');
             }
 
         });
