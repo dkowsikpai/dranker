@@ -11,6 +11,7 @@ urlpatterns = [
     # path('logout/', views.lout, name='lout'),
     path('printw/', views.printw, name='printw'),
     path('dload/', views.dload, name='dload'),
+    path('getplotdata/', views.plot, name='getplotdata'),
 ]
 
 if settings.DEBUG:
