@@ -3,10 +3,14 @@ from django.contrib.auth import authenticate, login
 # from django.views.decorators.csrf import csrf_exempt
 import re
 import csv
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
 # Create your views here.
 def login(request):
     return render(request, 'acc/loginpg.html')
 #
+
 
 
 def authen(request):
@@ -33,7 +37,16 @@ def home(request):
 
 def dload(request):
     scode = str(int(extmrk(request.POST['scode'])))
-    return HttpResponse('media/csv/'+scode+'.csv')
+    return HttpResponse('/media/csv/'+scode+'.csv')
+
+def plot(request):
+    scode = str(int(extmrk(request.POST['scode'])))
+    train = pd.read_csv('/home/dranker/dranker/media/csv/'+scode+'.csv')
+    sns.lineplot(x='rank', y='tot', data = train)
+    plt.savefig('/home/dranker/dranker/media/plot/'+scode+'.png')
+    plt.close()
+    return HttpResponse('/media/plot/'+scode+'.png')
+
 
 def printw(request):
     data = request.POST['d']
@@ -72,7 +85,7 @@ def printw(request):
         dic['rank'] = rank
         rank += 1
     csv_columns = ['rank', 'regno', 'name', 'bth', 's1', 's2', 's3', 's4', 's5', 's6', 'tot', 'percent', 'result']
-    with open('media/csv/'+scode+'.csv', 'w') as output:
+    with open('/home/dranker/dranker/media/csv/'+scode+'.csv', 'w') as output:
         writer = csv.writer(output)
         writer = csv.DictWriter(output, fieldnames=csv_columns)
         writer.writeheader()
